@@ -15,7 +15,7 @@ from models import db, connect_db, Message, User, Likes
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test2"
 
 
 # Now we can import app
@@ -136,7 +136,7 @@ class MessageViewTestCase(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.testuser.id
 
-            res = c.get(f"/messages/{self.message.id}/delete", follow_redirects=True)
+            res = c.post(f"/messages/{self.message.id}/delete", follow_redirects=True)
             html = res.get_data(as_text=True)
 
             self.assertEqual(res.status_code, 200)
@@ -146,7 +146,7 @@ class MessageViewTestCase(TestCase):
         """ delete message without being logged in? """
 
         with self.client as c:
-            res = c.get(f"/messages/{self.message.id}/delete", follow_redirects=True)
+            res = c.post(f"/messages/{self.message.id}/delete", follow_redirects=True)
             html = res.get_data(as_text=True)
             self.assertEqual(res.status_code, 200)
             self.assertIn("Access unauthorized.", html)
@@ -176,7 +176,7 @@ class MessageViewTestCase(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = user2_id
 
-            res = c.get(f"/messages/{message2_id}/delete", follow_redirects=True)
+            res = c.post(f"/messages/{message2_id}/delete", follow_redirects=True)
             html = res.get_data(as_text=True)
             self.assertEqual(res.status_code, 200)
             self.assertIn("Access unauthorized.", html)

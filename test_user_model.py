@@ -16,7 +16,7 @@ from models import db, User, Message, Follows
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test2"
 
 
 # Now we can import app
@@ -60,13 +60,17 @@ class UserModelTestCase(TestCase):
 
         self.client = app.test_client()
 
+    def tearDown(self):
+        
+        db.session.rollback()
+
 
     def test_user_model(self):
         """Does basic model work?"""
 
         u = User(
-            email="test@test.com",
-            username="testuser",
+            email="test5@test.com",
+            username="testuser5",
             password="HASHED_PASSWORD"
         )
 
@@ -84,7 +88,7 @@ class UserModelTestCase(TestCase):
         db.session.commit()
 
         self.assertEqual(self.user1.following[0].id, self.user2.id)
-        self.assertNotEqual(self.user2.following[0].id, self.user1.id)
+        self.assertEqual(len(self.user2.following), 0)
 
     def test_is_followed_by(self):
         """ does followers functionality work? """
@@ -93,7 +97,7 @@ class UserModelTestCase(TestCase):
         db.session.commit()
 
         self.assertEqual(self.user1.followers[0].id, self.user2.id)
-        self.assertNotEqual(self.user2.followers[0].id, self.user1.id)
+        self.assertEqual(len(self.user2.followers), 0)
 
     def test_user_create(self):
         """ does signup functionality work? """
@@ -141,7 +145,7 @@ class UserModelTestCase(TestCase):
 
     def test_bad_email_create(self):
         """ test signup with no password """
-        user6 = User.signup(username="testuser6",
+        user5 = User.signup(username="testuser6",
                             email=None,
                             password="password",
                             image_url="http://testimage.com/test.jpg")

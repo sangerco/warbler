@@ -2,7 +2,7 @@
 
 # run these tests like:
 #
-#    python -m unittest test_user_model.py
+#    python -m unittest test_message_model.py
 
 
 import os
@@ -11,7 +11,7 @@ from sqlalchemy import exc
 
 from models import db, User, Message, Follows, Likes
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test2"
 
 from app import app
 
@@ -59,15 +59,14 @@ class MessageModelTestCase(TestCase):
 
         msg = Message(
             text="test2test2test2",
-            timestamp="2022-12-07 12:23:53.522807"
-            user_id=self.user1_id
+            timestamp="2022-12-07 12:23:53.522807",
+            user_id=self.user1_id,
         )
 
         db.session.add(msg)
         db.session.commit()
 
-        self.assertEqual(len(msg.likes), 0)
-        self.assertEqual(self.user1.messages[0].text, "test2test2test2")
+        self.assertEqual(self.user1.messages[1].text, "test2test2test2")
 
     def test_message_likes(self):
         """ test if message can get likes """
@@ -77,6 +76,6 @@ class MessageModelTestCase(TestCase):
         db.session.add(like)
         db.session.commit()
 
-        self.assertEqual(len(self.message1.likes), 1)
+        self.assertEqual(Likes.query.get(1).message_id, self.message1_id)
 
     

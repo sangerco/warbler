@@ -248,7 +248,7 @@ def user_likes(user_id):
 
 
 
-@app.route('/users/delete', methods=["POST"])
+@app.route('/users/delete', methods=["GET","POST"])
 def delete_user():
     """Delete user."""
 
@@ -307,6 +307,11 @@ def messages_destroy(message_id):
         return redirect("/")
 
     msg = Message.query.get(message_id)
+    
+    if msg.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     db.session.delete(msg)
     db.session.commit()
 

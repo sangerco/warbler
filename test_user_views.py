@@ -2,7 +2,7 @@
 
 # run these tests like:
 #
-#    FLASK_ENV=production python -m unittest test_message_views.py
+#    FLASK_ENV=production python -m unittest test_user_views.py
 
 
 import os
@@ -15,7 +15,7 @@ from models import db, connect_db, Message, User, Likes, Follows
 # before we import our app, since that will have already
 # connected to the database
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///warbler-test2"
 
 
 # Now we can import app
@@ -92,7 +92,7 @@ class UserViewTestCase(TestCase):
         """ test user home page """
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             url = ('/')
@@ -106,8 +106,6 @@ class UserViewTestCase(TestCase):
         """ test user list page """
 
         with self.client as c:
-            with c.session_transaction as sess:
-                sess[CURR_USER_KEY] = self.user1.id
 
             url = ('/users')
             res = c.get(url)
@@ -122,7 +120,7 @@ class UserViewTestCase(TestCase):
         """ test to edit user """
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             user = {"username": "Edited", "password":"password"}
@@ -136,7 +134,7 @@ class UserViewTestCase(TestCase):
         """ test user detail page """
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             url = (f"/users/{self.user1.id}")
@@ -159,7 +157,7 @@ class UserViewTestCase(TestCase):
         db.session.commit()
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             url = (f"/users/{self.user1.id}/following")
@@ -181,7 +179,7 @@ class UserViewTestCase(TestCase):
         db.session.commit()
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             url = (f"/users/{self.user1.id}/followers")
@@ -214,7 +212,7 @@ class UserViewTestCase(TestCase):
 
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
             url = (f"/users/{self.user1.id}/likes")
@@ -257,17 +255,16 @@ class UserViewTestCase(TestCase):
         user6_id = 666
         user6.id = user6_id
 
-        db.commit()
+        db.session.commit()
 
         self.user6 = user6
 
         with self.client as c:
-            with c.session_transaction as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user6.id  
 
             url = ('/users/delete')  
             res = c.get(url)
             html = res.get_data(as_text=True)
 
-            self.assertEqual(res.status_code, 200)
-            self.assertIn('Join Warbler today.', html) 
+            self.assertEqual(res.status_code, 302)
